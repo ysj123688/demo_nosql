@@ -18,7 +18,7 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.UpdateOptions;
 
 /**
- * MongoDB工具类(单数据源)
+ * MongoDB工具类(单数据源,单例模式)
  *
  * @author jerome_s@qq.com
  */
