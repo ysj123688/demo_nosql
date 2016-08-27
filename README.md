@@ -1,2 +1,3 @@
-# demo_mongodb
-MongoDB各种demo和MongoDB脚本
+# demo_nosql
+##包含
+1. MongoDB各种demo和MongoDB脚本

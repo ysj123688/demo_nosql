@@ -1,4 +1,4 @@
-package com.demo;
+package com.demo.mongodb;
 
 import java.util.ArrayList;
 import java.util.Arrays;

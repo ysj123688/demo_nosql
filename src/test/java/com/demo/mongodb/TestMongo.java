@@ -1,4 +1,4 @@
-package com.demo;
+package com.demo.mongodb;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,8 +12,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.demo.MongoUtil;
-import com.demo.MongoUtilFactory;
+import com.demo.mongodb.MongoUtil;
+import com.demo.mongodb.MongoUtilFactory;
 
 public class TestMongo {
 

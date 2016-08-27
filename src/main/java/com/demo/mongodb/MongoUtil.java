@@ -1,4 +1,4 @@
-package com.demo;
+package com.demo.mongodb;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,30 +18,23 @@ import com.mongodb.client.MongoDatabase;
 import com.mongodb.client.model.UpdateOptions;
 
 /**
- * MongoDB数据库2工具类
- * 
- * @author suzhida
+ * MongoDB工具类(单数据源,单例模式)
+ *
+ * @author jerome_s@qq.com
  */
-public class MongoUtil2 implements MongoUtilI {
+public class MongoUtil {
 
-	// 以下为MongoDB连接配置,根据需要修改
-	private String HOST = GetCfg.getValue("MongoDB_Host_2");
-	private int PORT = Integer.parseInt(GetCfg.getValue("MongoDB_Port_2"));
-	private String DATABASENAME = GetCfg.getValue("MongoDB_DBName_2");
-	private String USERNAME = GetCfg.getValue("MongoDB_UserName_2");
-	private char[] PASSWORD = GetCfg.getValue("MongoDB_PassWord_2").toCharArray();
-	
-	public static MongoUtil2 mongoUtil = null;
+	public static MongoUtil mongoUtil = null;
 	public static MongoClient mongoClient = null;
 	public static MongoDatabase mongoDataBase = null;
 
-	private MongoUtil2() {
+	private MongoUtil() {
 
 	}
 
-	public static MongoUtil2 getInstance() {
+	public static MongoUtil getInstance() {
 		if (mongoUtil == null) {
-			mongoUtil = new MongoUtil2();
+			mongoUtil = new MongoUtil();
 		}
 		return mongoUtil;
 	}
@@ -75,8 +68,14 @@ public class MongoUtil2 implements MongoUtilI {
 		return mongoDataBase.getCollection(collectionName);
 	}
 
-	public void getMongoClient() {
+	private void getMongoClient() {
 		try {
+			String HOST = GetCfg.getValue("MongoDB_Host");
+			int PORT = Integer.parseInt(GetCfg.getValue("MongoDB_Port"));
+			String DATABASENAME = GetCfg.getValue("MongoDB_DBName");
+			String USERNAME = GetCfg.getValue("MongoDB_UserName");
+			char[] PASSWORD = GetCfg.getValue("MongoDB_PassWord").toCharArray();
+
 			if (USERNAME != null && USERNAME.length() > 0) {
 				// 需要权限认证的方式
 				ServerAddress addr = new ServerAddress(HOST, PORT);
@@ -94,9 +93,10 @@ public class MongoUtil2 implements MongoUtilI {
 		}
 	}
 
-	public void getMongoDataBase() {
+	private void getMongoDataBase() {
 		try {
 			if (mongoClient != null) {
+				String DATABASENAME = GetCfg.getValue("MongoDB_DBName");
 				mongoDataBase = mongoClient.getDatabase(DATABASENAME);
 			} else {
 				throw new RuntimeException("MongoClient不能够为空");
@@ -106,7 +106,7 @@ public class MongoUtil2 implements MongoUtilI {
 		}
 	}
 
-	public void closeMongoClient() {
+	private void closeMongoClient() {
 		if (mongoDataBase != null) {
 			mongoDataBase = null;
 		}
@@ -123,9 +123,9 @@ public class MongoUtil2 implements MongoUtilI {
 	 * @param document
 	 *            文档
 	 */
-	public void insert(String collectionName, Document document) {
+	public static void insert(String collectionName, Document document) {
 		if (collectionName != null && !"".equals(collectionName) && document != null) {
-			MongoCollection<Document> connection = MongoUtil2.getCollection(collectionName);
+			MongoCollection<Document> connection = MongoUtil.getCollection(collectionName);
 			connection.insertOne(document);
 		}
 	}
@@ -138,9 +138,9 @@ public class MongoUtil2 implements MongoUtilI {
 	 * @param documentList
 	 *            文档列表
 	 */
-	public void insertMany(String collectionName, List<Document> documentList) {
+	public static void insertMany(String collectionName, List<Document> documentList) {
 		if (collectionName != null && !"".equals(collectionName) && documentList != null && documentList.size() > 0) {
-			MongoCollection<Document> connection = MongoUtil2.getCollection(collectionName);
+			MongoCollection<Document> connection = MongoUtil.getCollection(collectionName);
 			connection.insertMany(documentList);
 		}
 	}
@@ -157,8 +157,8 @@ public class MongoUtil2 implements MongoUtilI {
 	 * @param limit
 	 * @return
 	 */
-	public List<Document> find(String collectionName, Document where, Document sort, int limit, int skip) {
-		MongoCollection<Document> connection = MongoUtil2.getCollection(collectionName);
+	public static List<Document> find(String collectionName, Document where, Document sort, int limit, int skip) {
+		MongoCollection<Document> connection = MongoUtil.getCollection(collectionName);
 		FindIterable<Document> iterable = connection.find(where).sort(sort).skip(skip).limit(limit);
 		MongoCursor<Document> cursor = iterable.iterator();
 		try {
@@ -185,8 +185,8 @@ public class MongoUtil2 implements MongoUtilI {
 	 *            查询条件集合
 	 * @return
 	 */
-	public List<Document> findByAggregate(String collectionName, List<Document> docs) {
-		MongoCollection<Document> connection = MongoUtil2.getCollection(collectionName);
+	public static List<Document> findByAggregate(String collectionName, List<Document> docs) {
+		MongoCollection<Document> connection = MongoUtil.getCollection(collectionName);
 		AggregateIterable<Document> iterable = connection.aggregate(docs);
 		MongoCursor<Document> cursor = iterable.iterator();
 		try {
@@ -215,7 +215,7 @@ public class MongoUtil2 implements MongoUtilI {
 	 *            分组
 	 * @return
 	 */
-	public List<Document> findByAggregate(String collectionName, Document matchDoc, Document groupDoc) {
+	public static List<Document> findByAggregate(String collectionName, Document matchDoc, Document groupDoc) {
 		List<Document> docs = new ArrayList<>();
 		docs.add(matchDoc);
 		docs.add(groupDoc);
@@ -232,7 +232,7 @@ public class MongoUtil2 implements MongoUtilI {
 	 * @param limit
 	 * @return
 	 */
-	public List<Document> find(String collectionName, Document where, int limit, int skip) {
+	public static List<Document> find(String collectionName, Document where, int limit, int skip) {
 		return find(collectionName, where, null, limit, skip);
 	}
 
@@ -245,8 +245,8 @@ public class MongoUtil2 implements MongoUtilI {
 	 *            条件
 	 * @return
 	 */
-	public Long count(String collectionName, Document where) {
-		MongoCollection<Document> connection = MongoUtil2.getCollection(collectionName);
+	public static Long count(String collectionName, Document where) {
+		MongoCollection<Document> connection = MongoUtil.getCollection(collectionName);
 		return connection.count(where);
 	}
 
@@ -256,8 +256,8 @@ public class MongoUtil2 implements MongoUtilI {
 	 * @param collectionName
 	 *            集合名称
 	 */
-	public void dropCollection(String collectionName) {
-		MongoCollection<Document> connection = MongoUtil2.getCollection(collectionName);
+	public static void dropCollection(String collectionName) {
+		MongoCollection<Document> connection = MongoUtil.getCollection(collectionName);
 		connection.drop();
 	}
 
@@ -272,9 +272,9 @@ public class MongoUtil2 implements MongoUtilI {
 	 *            更新文档
 	 * @param options
 	 */
-	public void updateOrInsertOne(String collectionName, Document where, Document update) {
+	public static void updateOrInsertOne(String collectionName, Document where, Document update) {
 		if (collectionName != null && !"".equals(collectionName) && where != null && update != null) {
-			MongoCollection<Document> connection = MongoUtil2.getCollection(collectionName);
+			MongoCollection<Document> connection = MongoUtil.getCollection(collectionName);
 			UpdateOptions updateOptions = new UpdateOptions();
 			updateOptions.upsert(true);// 集合不存在时创建一个集合
 			connection.updateOne(where, new Document("$set", update), updateOptions);
@@ -291,9 +291,9 @@ public class MongoUtil2 implements MongoUtilI {
 	 * @param update
 	 *            更新文档
 	 */
-	public void updateOrInsertMany(String collectionName, Document where, Document update) {
+	public static void updateOrInsertMany(String collectionName, Document where, Document update) {
 		if (collectionName != null && !"".equals(collectionName) && where != null && update != null) {
-			MongoCollection<Document> connection = MongoUtil2.getCollection(collectionName);
+			MongoCollection<Document> connection = MongoUtil.getCollection(collectionName);
 			UpdateOptions updateOptions = new UpdateOptions();
 			updateOptions.upsert(true);// 集合不存在时创建一个集合
 			connection.updateMany(where, new Document("$set", update), updateOptions);

@@ -1,4 +1,4 @@
-package com.demo;
+package com.demo.mongodb;
 
 import java.io.IOException;
 import java.io.InputStream;

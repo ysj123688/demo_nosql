@@ -1,4 +1,4 @@
-package com.demo;
+package com.demo.mongodb;
 
 /**
  * MongoDB工具工厂类(支持多数据源,单例模式,工厂模式)

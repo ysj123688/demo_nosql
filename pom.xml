@@ -3,11 +3,11 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.demo</groupId>
-	<artifactId>demo_mongodb</artifactId>
+	<artifactId>demo_nosql</artifactId>
 	<version>0.0.1</version>
 	<packaging>jar</packaging>
 
-	<name>demo_mongodb</name>
+	<name>demo_nosql</name>
 	<url>http://maven.apache.org</url>
 
 	<properties>
